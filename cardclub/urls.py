@@ -25,3 +25,9 @@ urlpatterns = [
 	path('api/auth/', include('djoser.urls.authtoken')),
 	path('api/', include(router.urls))
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls))
+    ] + urlpatterns

@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     # Third-party
     'debug_toolbar',
     'django_extensions',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 
     # Project-specific
     'cardclub',
@@ -129,7 +132,7 @@ STATICFILES_DIRS = [
 
 # Custom user model
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'cardclub.User'
 
 # Debug toolbar config
 

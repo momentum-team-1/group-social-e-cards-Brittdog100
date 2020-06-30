@@ -2,14 +2,17 @@ from rest_framework import routers, serializers, viewsets
 
 from .models import Card
 
-router = routers.DefaultRouter
+router = routers.DefaultRouter()
 
-class CardSerializer(serializers.ModelSerializer):
+class CardSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = Card
 		fields = [
 			'id',
-			'url'
+			'url',
+			'recipient',
+			'text_inner',
+			'text_outer',
 		]
 class CardViewSet(viewsets.ModelViewSet):
 	queryset = Card.objects.all()

@@ -142,6 +142,11 @@ INTERNAL_IPS = [
 	# ...
 ]
 
+# Heroku setup
+import django_heroku
+django_heroku.settings(locals())
+del DATABASES['default']['OPTIONS']['sslmode']
+
 # Rest
 REST_FRAMEWORK = {
 	'DEFAULT_PERMISSION_CLASSES': [ 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly' ],

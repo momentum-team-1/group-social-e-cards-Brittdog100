@@ -1,1 +1,1 @@
-web: gunicorn questionbox.wsgi
+web: gunicorn cardclub.wsgi

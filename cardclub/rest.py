@@ -20,5 +20,5 @@ class CardViewSet(viewsets.ModelViewSet):
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
 	def get_queryset(self):
-		return CardViewSet.queryset.filter(user = self.request.user)
+		return CardViewSet.queryset.filter(author = self.request.user)
 router.register('card', CardViewSet)

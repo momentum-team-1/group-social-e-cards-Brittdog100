@@ -40,7 +40,7 @@ def add_friend(request, username):
 	if username == request.user.username:
 		return HttpResponse(status = 403)
 	target = get_object_or_404(User, username = username)
-	if len(request.user.friends.filter(username = username) != 0:
+	if len(request.user.friends.filter(username = username)) != 0:
 		return HttpResponse(status = 202)
 	request.user.friends.add(target)
 	request.user.save()

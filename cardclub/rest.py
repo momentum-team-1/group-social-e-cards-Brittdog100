@@ -4,7 +4,12 @@ from .models import Card, User
 
 router = routers.DefaultRouter()
 
+class FriendSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = User
+		fields = ['id', 'url']
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+	friends = FriendSerializer(many = True, required = False, default = [])
 	class Meta:
 		model = User
 		fields = [

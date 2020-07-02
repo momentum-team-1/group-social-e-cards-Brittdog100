@@ -1,8 +1,21 @@
 from rest_framework import routers, serializers, viewsets
 
-from .models import Card
+from .models import Card, User
 
 router = routers.DefaultRouter()
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = User
+		fields = [
+			'id',
+			'url',
+			'friends'
+		]
+class UserViewSet(viewsets.ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = UserSerializer
+router.register('user', UserViewSet)
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:

@@ -56,7 +56,7 @@ class CardViewSet(viewsets.ModelViewSet):
 	def get_queryset(self):
 		return CardViewSet.queryset.all()
 	@action(detail = False, methods = ['GET'])
-	def mine(self, request):
+	def mine(self, request, page):
 		serializer = CardSerializer(
 			CardViewSet.queryset.filter(author = request.user),
 			many = True,
@@ -64,11 +64,14 @@ class CardViewSet(viewsets.ModelViewSet):
 		)
 		return Response(serializer.data)
 	@action(detail = False, methods = ['GET'])
-	def feed(self, request):
+	def feed(self, request, page = 0):
 		serializer = CardSerializer(
 			CardViewSet.queryset.filter(author__in = request.user.friends.all()),
 			many = True,
 			context = { 'request': request }
 		)
-		return Response(serializer.data)
+		pager = self.paginate_queryset(CardViewSet.queryset)
+		if page == 0 or pager is None:
+			return Response(serializer.data)
+		return self.get_paginated_response(serializer.data)
 router.register('card', CardViewSet)

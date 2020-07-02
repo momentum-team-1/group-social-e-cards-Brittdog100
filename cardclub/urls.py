@@ -19,6 +19,7 @@ from django.urls import include, path
 
 from . import views as ajax
 from .rest import router
+from .rest import CardViewSet as card
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,7 +29,9 @@ urlpatterns = [
 
     path('api/ajax/relation/<str:username>', ajax.friend_relation, name = 'friend_relation'),
     path('api/ajax/add_friend/<str:username>', ajax.add_friend, name = 'add_friend'),
-    path('api/ajax/del_friend/<str:username>', ajax.del_friend, name = 'del_friend')
+    path('api/ajax/del_friend/<str:username>', ajax.del_friend, name = 'del_friend'),
+
+    path('api/feed/<int:page>', card.as_view({ 'get': 'feed'}), name = 'feed')
 ]
 
 if settings.DEBUG:

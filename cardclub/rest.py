@@ -9,7 +9,7 @@ class FriendSerializer(serializers.HyperlinkedModelSerializer):
 		model = User
 		fields = ['username', 'url']
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-	friends = FriendSerializer(many = True, required = False, default = [])
+	friends = FriendSerializer(read_only = True, many = True, required = False, default = [])
 	class Meta:
 		model = User
 		fields = [

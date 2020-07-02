@@ -17,13 +17,18 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
 
+import .views as ajax
 from .rest import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('api/auth/', include('djoser.urls')),
 	path('api/auth/', include('djoser.urls.authtoken')),
-	path('api/', include(router.urls))
+	path('api/', include(router.urls)),
+
+    path('api/ajax/relation/<str:username>', ajax.friend_relation, name = 'friend_relation'),
+    path('api/ajax/add_friend/<str:username>', ajax.add_friend, name = 'add_friend'),
+    path('api/ajax/del_friend/<str:username>', ajax.del_friend, name = 'del_friend')
 ]
 
 if settings.DEBUG:

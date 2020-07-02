@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
 
-from cardclub import views as ajax
+from . import views as ajax
 from .rest import router
 
 urlpatterns = [

@@ -14,3 +14,4 @@ class Card(models.Model):
 	text_outer = models.CharField(max_length = MAX_FIELD_LEN)
 	styles = models.CharField(max_length = MAX_INTERNAL_LEN, blank = True)
 	image_url = models.CharField(max_length = MAX_INTERNAL_LEN, null = True)
+	timestamp = models.DateTimeField(auto_now_add = True)

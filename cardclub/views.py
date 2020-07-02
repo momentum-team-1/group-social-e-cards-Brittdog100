@@ -1,7 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
+
 from .models import Card, User
+from .rest import CardViewSet
 
 @login_required
 def friend_relation(request, username):

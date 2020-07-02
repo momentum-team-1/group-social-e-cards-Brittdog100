@@ -1,6 +1,9 @@
 from rest_framework import routers, serializers, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import Card, User
+from . import views as ajax
 
 router = routers.DefaultRouter()
 
@@ -32,7 +35,8 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
 			'text_inner',
 			'text_outer',
 			'styles',
-			'image_url'
+			'image_url',
+			'timestamp'
 		]
 class CardViewSet(viewsets.ModelViewSet):
 	queryset = Card.objects.all()
@@ -40,5 +44,21 @@ class CardViewSet(viewsets.ModelViewSet):
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
 	def get_queryset(self):
-		return CardViewSet.queryset.filter(author = self.request.user)
+		return CardViewSet.queryset.all()
+	@action(detail = False, methods = ['GET'])
+	def mine(self, request):
+		serializer = CardSerializer(
+			CardViewSet.queryset.filter(author = request.user),
+			many = True,
+			context = { 'request': request }
+		)
+		return Response(serializer.data)
+	@action(detail = False, methods = ['GET'])
+	def feed(self, request):
+		serializer = CardSerializer(
+			CardViewSet.queryset.filter(author__in = request.user.friends.all()),
+			many = True,
+			context = { 'request': request }
+		)
+		return Response(serializer.data)
 router.register('card', CardViewSet)

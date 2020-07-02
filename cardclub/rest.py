@@ -49,7 +49,7 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
 			'timestamp'
 		]
 class CardViewSet(viewsets.ModelViewSet):
-	queryset = Card.objects.all()
+	queryset = Card.objects.order_by('-timestamp').all()
 	serializer_class = CardSerializer
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)

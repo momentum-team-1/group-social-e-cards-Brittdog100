@@ -13,6 +13,8 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
 			'recipient',
 			'text_inner',
 			'text_outer',
+			'styles',
+			'image_url'
 		]
 class CardViewSet(viewsets.ModelViewSet):
 	queryset = Card.objects.all()

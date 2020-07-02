@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,7 +11,7 @@ router = routers.DefaultRouter()
 class FriendSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = User
-		fields = ['username', 'url']
+		fields = ['username', 'url', 'first_name', 'last_name']
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 	friends = FriendSerializer(read_only = True, many = True, required = False, default = [])
 	class Meta:
@@ -58,7 +59,7 @@ class CardViewSet(viewsets.ModelViewSet):
 	@action(detail = False, methods = ['GET'])
 	def mine(self, request, page):
 		serializer = CardSerializer(
-			CardViewSet.queryset.filter(author = request.user),
+			CardViewSet.queryset.filter(Q(author = request.user) | Q(recipient = request.user)),
 			many = True,
 			context = { 'request': request }
 		)

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
 
-import .views as ajax
+import views as ajax
 from .rest import router
 
 urlpatterns = [

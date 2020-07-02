@@ -17,12 +17,22 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 		model = User
 		fields = [
 			'username',
+			'first_name',
+			'last_name',
 			'url',
 			'friends'
 		]
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
+	@action(detail = False, methods = ['GET'])
+	def friends(self, request):
+		serializer = UserSerializer(
+			UserViewSet.queryset.filter(user__in = request.user.friends.all()),
+			many = True,
+			context = { 'context': request }
+		)
+		return Response(serializer.data)
 router.register('user', UserViewSet)
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):

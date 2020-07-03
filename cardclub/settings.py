@@ -142,6 +142,8 @@ INTERNAL_IPS = [
 	# ...
 ]
 
+APPEND_SLASH = False
+
 # Heroku setup
 import django_heroku
 django_heroku.settings(locals())

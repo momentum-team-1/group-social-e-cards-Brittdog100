@@ -7,7 +7,8 @@ from .rest import CardViewSet
 
 @login_required
 def friend_relation(request, username):
-	"""Returns a string representing the relationship to another user:
+	"""
+	Returns a string representing the relationship to another user:
 	'none' if neither user has added each other;
 	'friends' if both users have added each other;
 	'pending' if the request's user has added the target;

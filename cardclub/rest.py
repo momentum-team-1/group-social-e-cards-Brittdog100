@@ -1,10 +1,11 @@
 from django.db.models import Q
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Card, User
-from . import views as ajax
 
 router = routers.DefaultRouter()
 
@@ -34,14 +35,45 @@ class UserViewSet(viewsets.ModelViewSet):
 			context = { 'context': request }
 		)
 		return Response(serializer.data)
+	@action(detail = True, methods = ['GET', 'POST', 'DELETE'])
+	def friend(self, request, pk):
+		target = get_object_or_404(User, pk = pk)
+		if request.user.username == target.username:
+			return HttpResponse(status = 403)
+		if request.method == 'GET':
+			my_friend = len(self.request.user.friends.filter(username = target.username)) == 1
+			their_friend = len(target.friends.filter(username = self.request.user.username)) == 1
+			output = { 'rel': 'none' }
+			if my_friend and their_friend:
+				output['rel'] = 'friends'
+			elif my_friend and not their_friend:
+				output['rel'] = 'pending'
+			elif their_friend and not my_friend:
+				output['rel'] = 'requested'
+			return JsonResponse(output)
+		elif request.method == 'POST':
+			if len(request.user.friends.filter(username = target.username)) != 0:
+				return HttpResponse(status = 202)
+			request.user.friends.add(target)
+			request.user.save()
+			return HttpResponse(status = 200)
+		elif request.method == 'DELETE':
+			if len(request.user.friends.filter(username = username)) == 0:
+				return HttpResponse(status = 202)
+			request.user.friends.remove(target)
+			target.friends.remove(request.user)
+			request.user.save()
+			return HttpResponse(200)
 router.register('user', UserViewSet)
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
+	author = serializers.ReadOnlyField(source = 'author.username')
 	class Meta:
 		model = Card
 		fields = [
 			'id',
 			'url',
+			'author',
 			'recipient',
 			'text_inner',
 			'text_outer',
@@ -50,14 +82,14 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
 			'timestamp'
 		]
 class CardViewSet(viewsets.ModelViewSet):
-	queryset = Card.objects.order_by('-timestamp').all()
+	queryset = Card.objects.all().order_by('-timestamp')
 	serializer_class = CardSerializer
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
 	def get_queryset(self):
 		return CardViewSet.queryset.all()
 	@action(detail = False, methods = ['GET'])
-	def mine(self, request, page):
+	def mine(self, request, page = 0):
 		serializer = CardSerializer(
 			CardViewSet.queryset.filter(Q(author = request.user) | Q(recipient = request.user)),
 			many = True,

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 	'rest_framework',
 	'rest_framework.authtoken',
 	'djoser',
+	'corsheaders',
 
 	# Project-specific
 	'cardclub',
@@ -64,6 +65,8 @@ MIDDLEWARE = [
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
+	'django.middleware.common.CommonMiddleware',  
 ]
 
 ROOT_URLCONF = 'cardclub.urls'
@@ -154,3 +157,11 @@ REST_FRAMEWORK = {
 	'DEFAULT_PERMISSION_CLASSES': [ 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly' ],
 	'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication','rest_framework.authentication.SessionAuthentication')
 }
+
+if DEBUG:
+	CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = {
+	# add ashley's app here
+}
+

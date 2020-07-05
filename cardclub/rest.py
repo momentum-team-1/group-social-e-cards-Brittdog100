@@ -58,7 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
 			request.user.save()
 			return HttpResponse(status = 200)
 		elif request.method == 'DELETE':
-			if len(request.user.friends.filter(username = username)) == 0:
+			if len(request.user.friends.filter(username = target.username)) == 0:
 				return HttpResponse(status = 202)
 			request.user.friends.remove(target)
 			target.friends.remove(request.user)

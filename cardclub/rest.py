@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import Card, Comment, User
@@ -95,29 +96,29 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
 class CardViewSet(viewsets.ModelViewSet):
 	queryset = Card.objects.all().order_by('-timestamp')
 	serializer_class = CardSerializer
+	pager = PageNumberPagination()
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
 	def get_queryset(self):
 		return CardViewSet.queryset.all()
 	@action(detail = False, methods = ['GET'])
 	def mine(self, request, page = 0):
+		results = self.pager.paginate_queryset(CardViewSet.queryset.filter(Q(author = request.user) | Q(recipient = request.user)), request)
 		serializer = CardSerializer(
-			CardViewSet.queryset.filter(Q(author = request.user) | Q(recipient = request.user)),
+			results,
 			many = True,
 			context = { 'request': request }
 		)
-		return Response(serializer.data)
+		return self.pager.get_paginated_response(serializer.data)
 	@action(detail = False, methods = ['GET'])
 	def feed(self, request, page = 0):
+		results = self.pager.paginate_queryset(CardViewSet.queryset.filter(author__in = request.user.friends.all()), request)
 		serializer = CardSerializer(
-			CardViewSet.queryset.filter(author__in = request.user.friends.all()),
+			results,
 			many = True,
 			context = { 'request': request }
 		)
-		pager = self.paginate_queryset(CardViewSet.queryset)
-		if page == 0 or pager is None:
-			return Response(serializer.data)
-		return self.get_paginated_response(serializer.data)
+		return self.pager.get_paginated_response(serializer.data)
 	@action(detail = True, methods = ['GET', 'POST'])
 	def comment(self, request, pk):
 		post = get_object_or_404(Card, pk = pk)
@@ -133,7 +134,7 @@ class CardViewSet(viewsets.ModelViewSet):
 			if not serializer.is_valid():
 				return HttpResponse(status = 400)
 			serializer.save(author = self.request.user, post = post)
-			return HttpResponse(status = 200)
+			return HttpResponse(status = 201)
 		if(request.method == 'DELETE'):
 			comment = get_object_or_404(Comment, pk = request.data['id'])
 			comment.delete()

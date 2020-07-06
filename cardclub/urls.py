@@ -26,7 +26,7 @@ urlpatterns = [
 	path('api/auth/', include('djoser.urls.authtoken')),
 	path('api/', include(router.urls)),
 
-    path('api/feed/<int:page>/', card.as_view({ 'get': 'feed'}), name = 'feed')
+    path('api/feed/', card.as_view({ 'get': 'feed'}), name = 'feed')
 ]
 
 if settings.DEBUG:

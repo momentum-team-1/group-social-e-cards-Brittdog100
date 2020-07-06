@@ -5,14 +5,14 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import Card, User
+from .models import Card, Comment, User
 
 router = routers.DefaultRouter()
 
 class FriendSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = User
-		fields = ['username', 'url', 'first_name', 'last_name']
+		fields = ['username', 'first_name', 'last_name']
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 	friends = FriendSerializer(read_only = True, many = True, required = False, default = [])
 	class Meta:
@@ -21,12 +21,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 			'username',
 			'first_name',
 			'last_name',
-			'url',
 			'friends'
 		]
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
+	lookup_field = 'username'
 	@action(detail = False, methods = ['GET'])
 	def friends(self, request):
 		serializer = UserSerializer(
@@ -36,12 +36,12 @@ class UserViewSet(viewsets.ModelViewSet):
 		)
 		return Response(serializer.data)
 	@action(detail = True, methods = ['GET', 'POST', 'DELETE'])
-	def friend(self, request, pk):
-		target = get_object_or_404(User, pk = pk)
-		if request.user.username == target.username:
+	def friend(self, request, username):
+		target = get_object_or_404(User, username = username)
+		if request.user.username == username:
 			return HttpResponse(status = 403)
 		if request.method == 'GET':
-			my_friend = len(self.request.user.friends.filter(username = target.username)) == 1
+			my_friend = len(self.request.user.friends.filter(username = username)) == 1
 			their_friend = len(target.friends.filter(username = self.request.user.username)) == 1
 			rel = 0
 			if my_friend:
@@ -50,13 +50,13 @@ class UserViewSet(viewsets.ModelViewSet):
 				rel += 2
 			return JsonResponse({ 'rel': rel })
 		elif request.method == 'POST':
-			if len(request.user.friends.filter(username = target.username)) != 0:
+			if len(request.user.friends.filter(username = username)) != 0:
 				return HttpResponse(status = 202)
 			request.user.friends.add(target)
 			request.user.save()
 			return HttpResponse(status = 200)
 		elif request.method == 'DELETE':
-			if len(request.user.friends.filter(username = target.username)) == 0:
+			if len(request.user.friends.filter(username = username)) == 0:
 				return HttpResponse(status = 202)
 			request.user.friends.remove(target)
 			target.friends.remove(request.user)
@@ -68,7 +68,13 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 	author = serializers.ReadOnlyField(source = 'author.username')
 	post = serializers.ReadOnlyField(source = 'post.pk')
 	class Meta:
-		pass
+		model = Comment
+		fields = [
+			'id',
+			'author',
+			'text',
+			'timestamp'
+		]
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
 	author = serializers.ReadOnlyField(source = 'author.username')
@@ -111,4 +117,19 @@ class CardViewSet(viewsets.ModelViewSet):
 		if page == 0 or pager is None:
 			return Response(serializer.data)
 		return self.get_paginated_response(serializer.data)
+	@action(detail = True, methods = ['GET', 'POST'])
+	def comment(self, request, pk):
+		post = get_object_or_404(Card, pk = pk)
+		if(request.method == 'GET'):
+			serializer = CommentSerializer(
+				Comment.objects.filter(post = post),
+				many = True,
+				context = { 'request': request }
+			)
+			return Response(serializer.data)
+		if(request.method == 'POST'):
+			serializer = CommentSerializer(
+
+			)
+
 router.register('card', CardViewSet)

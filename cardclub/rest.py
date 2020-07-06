@@ -112,7 +112,7 @@ class CardViewSet(viewsets.ModelViewSet):
 		return self.pager.get_paginated_response(serializer.data)
 	@action(detail = False, methods = ['GET'])
 	def feed(self, request, page = 0):
-		results = self.pager.paginate_queryset(CardViewSet.queryset.filter(author__in = request.user.friends.all()), request)
+		results = self.pager.paginate_queryset(CardViewSet.queryset.filter(author__followers = request.user), request)
 		serializer = CardSerializer(
 			results,
 			many = True,

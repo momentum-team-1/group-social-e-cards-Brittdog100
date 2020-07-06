@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-	friends = models.ManyToManyField(to = 'self', symmetrical = False)
+	friends = models.ManyToManyField(to = 'self', symmetrical = False, related_name = 'followers')
 
 MAX_FIELD_LEN = 256
 MAX_INTERNAL_LEN = 512

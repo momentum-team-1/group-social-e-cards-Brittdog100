@@ -64,6 +64,12 @@ class UserViewSet(viewsets.ModelViewSet):
 			return HttpResponse(200)
 router.register('user', UserViewSet)
 
+class CommentSerializer(serializers.HyperlinkedModelSerializer):
+	author = serializers.ReadOnlyField(source = 'author.username')
+	post = serializers.ReadOnlyField(source = 'post.pk')
+	class Meta:
+		pass
+
 class CardSerializer(serializers.HyperlinkedModelSerializer):
 	author = serializers.ReadOnlyField(source = 'author.username')
 	class Meta:

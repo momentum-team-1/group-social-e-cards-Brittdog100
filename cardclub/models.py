@@ -15,3 +15,9 @@ class Card(models.Model):
 	styles = models.CharField(max_length = MAX_INTERNAL_LEN, blank = True)
 	image_url = models.CharField(max_length = MAX_INTERNAL_LEN, null = True)
 	timestamp = models.DateTimeField(auto_now_add = True)
+
+class Comment(models.Model):
+	author = models.ForeignKey(to = User, on_delete = models.CASCADE, related_name = 'comments')
+	post = models.ForeignKey(to = User, on_delete = models.CASCADE, related_name = 'comments')
+	text = models.CharField(max_length = MAX_INTERNAL_LEN)
+	timestamp = models.DateTimeField(auto_now_add = True)

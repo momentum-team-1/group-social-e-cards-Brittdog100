@@ -43,14 +43,12 @@ class UserViewSet(viewsets.ModelViewSet):
 		if request.method == 'GET':
 			my_friend = len(self.request.user.friends.filter(username = target.username)) == 1
 			their_friend = len(target.friends.filter(username = self.request.user.username)) == 1
-			output = { 'rel': 'none' }
-			if my_friend and their_friend:
-				output['rel'] = 'friends'
-			elif my_friend and not their_friend:
-				output['rel'] = 'pending'
-			elif their_friend and not my_friend:
-				output['rel'] = 'requested'
-			return JsonResponse(output)
+			rel = 0
+			if my_friend:
+				rel += 1
+			if their_friend:
+				rel += 2
+			return JsonResponse({ 'rel': rel })
 		elif request.method == 'POST':
 			if len(request.user.friends.filter(username = target.username)) != 0:
 				return HttpResponse(status = 202)

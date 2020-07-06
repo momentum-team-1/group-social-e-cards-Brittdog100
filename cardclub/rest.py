@@ -134,5 +134,8 @@ class CardViewSet(viewsets.ModelViewSet):
 				return HttpResponse(status = 400)
 			serializer.save(author = self.request.user, post = post)
 			return HttpResponse(status = 200)
-
+		if(request.method == 'DELETE'):
+			comment = get_object_or_404(Comment, pk = request.data['id'])
+			comment.delete()
+			return HttpResponse(status = 200)
 router.register('card', CardViewSet)

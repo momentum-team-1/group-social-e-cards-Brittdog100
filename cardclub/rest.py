@@ -72,6 +72,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 		fields = [
 			'id',
 			'author',
+			'post',
 			'text',
 			'timestamp'
 		]
@@ -128,8 +129,10 @@ class CardViewSet(viewsets.ModelViewSet):
 			)
 			return Response(serializer.data)
 		if(request.method == 'POST'):
-			serializer = CommentSerializer(
-
-			)
+			serializer = CommentSerializer(data = request.data)
+			if not serializer.is_valid():
+				return HttpResponse(status = 400)
+			serializer.save(author = self.request.user, post = post)
+			return HttpResponse(status = 200)
 
 router.register('card', CardViewSet)

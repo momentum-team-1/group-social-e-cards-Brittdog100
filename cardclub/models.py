@@ -17,7 +17,7 @@ class Card(models.Model):
 	timestamp = models.DateTimeField(auto_now_add = True)
 
 class Comment(models.Model):
-	author = models.ForeignKey(to = User, on_delete = models.CASCADE)
-	post = models.ForeignKey(to = User, on_delete = models.CASCADE, related_name = 'comments')
+	author = models.ForeignKey(to = User, on_delete = models.CASCADE, related_name = 'comments')
+	post = models.ForeignKey(to = Card, on_delete = models.CASCADE, related_name = 'comments')
 	text = models.CharField(max_length = MAX_INTERNAL_LEN)
 	timestamp = models.DateTimeField(auto_now_add = True)

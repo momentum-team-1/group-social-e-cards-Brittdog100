@@ -80,6 +80,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
 	author = serializers.ReadOnlyField(source = 'author.username')
+	recipient = serializers.ReadOnlyField(source = 'recipient.username')
 	class Meta:
 		model = Card
 		fields = [

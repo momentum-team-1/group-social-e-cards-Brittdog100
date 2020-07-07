@@ -28,6 +28,17 @@ class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	lookup_field = 'username'
+	def get_queryset(self):
+		request = self.request
+		if not request.user.is_authenticated:
+			return User.objects.none()
+		if request.method == 'GET':
+			return User.objects.all()
+		else:
+			if request.user.is_staff:
+				return User.objects.all()
+			else:
+				return User.objects.get(user = request.user)
 	@action(detail = False, methods = ['GET'])
 	def friends(self, request):
 		serializer = UserSerializer(
@@ -100,10 +111,16 @@ class CardViewSet(viewsets.ModelViewSet):
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
 	def get_queryset(self):
-		return CardViewSet.queryset.all()
+		request = self.request
+		if not request.user.is_authenticated:
+			return Card.objects.none()
+		if request.method == 'GET':
+			return CardViewSet.queryset.all().order_by('-timestamp')
+		else:
+			return request.user.cards.all().order_by('-timestamp')
 	@action(detail = False, methods = ['GET'])
 	def mine(self, request, page = 0):
-		results = self.pager.paginate_queryset(CardViewSet.queryset.filter(Q(author = request.user) | Q(recipient = request.user)), request)
+		results = self.pager.paginate_queryset(self.get_queryset().filter(Q(author = request.user) | Q(recipient = request.user)), request)
 		serializer = CardSerializer(
 			results,
 			many = True,
@@ -112,7 +129,7 @@ class CardViewSet(viewsets.ModelViewSet):
 		return self.pager.get_paginated_response(serializer.data)
 	@action(detail = False, methods = ['GET'])
 	def feed(self, request, page = 0):
-		results = self.pager.paginate_queryset(CardViewSet.queryset.filter(author__followers = request.user), request)
+		results = self.pager.paginate_queryset(self.get_queryset().filter(author__followers = request.user), request)
 		serializer = CardSerializer(
 			results,
 			many = True,
@@ -137,6 +154,8 @@ class CardViewSet(viewsets.ModelViewSet):
 			return HttpResponse(status = 201)
 		if(request.method == 'DELETE'):
 			comment = get_object_or_404(Comment, pk = request.data['id'])
+			if not comment.author == request.user:
+				return HttpResponse(status = 403)
 			comment.delete()
 			return HttpResponse(status = 200)
 router.register('card', CardViewSet)

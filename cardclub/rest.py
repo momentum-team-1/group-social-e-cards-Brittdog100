@@ -60,7 +60,6 @@ class UserViewSet(viewsets.ModelViewSet):
 			if len(request.user.friends.filter(username = username)) == 0:
 				return HttpResponse(status = 202)
 			request.user.friends.remove(target)
-			target.friends.remove(request.user)
 			request.user.save()
 			return HttpResponse(200)
 router.register('user', UserViewSet)

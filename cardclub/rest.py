@@ -40,7 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
 				return User.objects.all()
 			else:
 				return User.objects.get(user = request.user)
-	@action(detail = False, methods = ['GET'])
+	@action(detail = True, methods = ['GET'])
 	def friend_list(self, request):
 		serializer = FriendSerializer(
 			request.user.friends.all(),

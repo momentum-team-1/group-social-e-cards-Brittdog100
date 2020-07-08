@@ -12,9 +12,11 @@ class Card(models.Model):
 	recipient = models.ForeignKey(to = User, null = True, on_delete = models.SET_NULL, related_name = "recieved")
 	text_inner = models.CharField(max_length = MAX_FIELD_LEN)
 	text_outer = models.CharField(max_length = MAX_FIELD_LEN)
-	styles = models.CharField(max_length = MAX_INTERNAL_LEN, blank = True)
+	font = models.CharField(max_length = MAX_INTERNAL_LEN, blank = True)
+	color = models.CharField(max_length = MAX_INTERNAL_LEN, blank = True)
 	image_url = models.CharField(max_length = MAX_INTERNAL_LEN, null = True)
 	timestamp = models.DateTimeField(auto_now_add = True)
+	score = models.IntegerField(default = 0)
 
 class Comment(models.Model):
 	author = models.ForeignKey(to = User, on_delete = models.CASCADE, related_name = 'comments')

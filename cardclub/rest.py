@@ -27,6 +27,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
+	pager = PageNumberPagination()
 	lookup_field = 'username'
 	def get_queryset(self):
 		request = self.request
@@ -40,7 +41,7 @@ class UserViewSet(viewsets.ModelViewSet):
 			else:
 				return User.objects.get(user = request.user)
 	@action(detail = False, methods = ['GET'])
-	def friends(self, request):
+	def friend_list(self, request):
 		serializer = FriendSerializer(
 			request.user.friends.all(),
 			many = True,
@@ -73,6 +74,16 @@ class UserViewSet(viewsets.ModelViewSet):
 			request.user.friends.remove(target)
 			request.user.save()
 			return HttpResponse(200)
+	@action(detail = True, methods = ['GET'])
+	def cards(self, request, username, page = 0):
+		user = get_object_or_404(User, username = username)
+		results = self.pager.paginate_queryset(user.cards.all(), request)
+		serializer = CardSerializer(
+			results,
+			many = True,
+			context = { 'request': request }
+		)
+		return self.pager.get_paginated_response(serializer.data)
 router.register('user', UserViewSet)
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -100,7 +111,8 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
 			'recipient',
 			'text_inner',
 			'text_outer',
-			'styles',
+			'font',
+			'color',
 			'image_url',
 			'timestamp'
 		]

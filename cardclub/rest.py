@@ -41,8 +41,8 @@ class UserViewSet(viewsets.ModelViewSet):
 				return User.objects.get(user = request.user)
 	@action(detail = False, methods = ['GET'])
 	def friends(self, request):
-		serializer = UserSerializer(
-			UserViewSet.queryset.filter(user__in = request.user.friends.all()),
+		serializer = FriendSerializer(
+			request.user.friends.all(),
 			many = True,
 			context = { 'context': request }
 		)

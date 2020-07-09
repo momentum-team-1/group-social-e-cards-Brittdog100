@@ -31,11 +31,6 @@ It's an API.
 
 `api/user/` - returns a list of all users
 
-`api/auth/users` - Djoser's user endpoint. Use this one for account creation
-
-- `GET`: gets a list of all users, too
-- `POST`: creates a new user.
-
 `api/user/<str:username>/` - Returns information on a specific user.
 
 `api/user/<str:username>/cards/` - Returns all cards authored by a given user.
@@ -47,3 +42,9 @@ It's an API.
 - `DELETE`: makes the logged in user unfollow the target
 
 `api/user/<str:username>/friend_list/` - Returns a list of all users the target is following.
+
+### Authentication (via Djoser)
+
+`api/auth/users/` - registers a new user. Aside from that, behaves the same as `api/user/` but with fewer endpoints
+
+`api/auth/token/login` - gets an auth token, requires the user's login information to return the token

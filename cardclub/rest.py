@@ -118,6 +118,12 @@ class CardViewSet(viewsets.ModelViewSet):
 	permission_classes = [permissions.IsAuthenticated]
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
+	def destroy(self, request, pk):
+		card = get_object_or_404(Card, pk = pk)
+		if card.author != request.user:
+			return HttpResponse(status = 403)
+		self.perform_destroy(card)
+		return HttpResponse(status = 200)
 	def get_queryset(self):
 		request = self.request
 		if not request.user.is_authenticated:

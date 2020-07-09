@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cardclub"
-version = "1.0.0"
+version = "1.0.0_1"
 description = ""
 authors = []
 

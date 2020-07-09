@@ -115,6 +115,7 @@ class CardViewSet(viewsets.ModelViewSet):
 	queryset = Card.objects.all().order_by('-timestamp')
 	serializer_class = CardSerializer
 	pager = PageNumberPagination()
+	permission_classes = [permissions.IsAuthenticated]
 	def perform_create(self, serializer):
 		serializer.save(author = self.request.user)
 	def get_queryset(self):

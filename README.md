@@ -31,7 +31,10 @@ It's an API.
 
 `api/user/` - returns a list of all users
 
-`api/user/new/` - creates a new user. Requires an `email`, `username`, and `password`.
+`api/auth/users` - Djoser's user endpoint. Use this one for account creation
+
+- `GET`: gets a list of all users, too
+- `POST`: creates a new user.
 
 `api/user/<str:username>/` - Returns information on a specific user.
 

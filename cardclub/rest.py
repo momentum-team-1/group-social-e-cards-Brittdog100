@@ -33,13 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
 		request = self.request
 		if not request.user.is_authenticated:
 			return User.objects.none()
-		if request.method == 'GET':
-			return User.objects.all()
-		else:
-			if request.user.is_staff:
-				return User.objects.all()
-			else:
-				return User.objects.get(user = request.user)
+		return User.objects.all()
 	@action(detail = True, methods = ['GET'])
 	def friend_list(self, request, username):
 		user = get_object_or_404(User, username = username)
@@ -49,7 +43,7 @@ class UserViewSet(viewsets.ModelViewSet):
 			context = { 'context': request }
 		)
 		return Response(serializer.data)
-	@action(detail = True, methods = ['GET', 'POST', 'DELETE'])
+	@action(detail = True, methods = ['GET', 'POST', 'DELETE'], permission_classes = [permissions.IsAuthenticated])
 	def friend(self, request, username):
 		target = get_object_or_404(User, username = username)
 		if request.user.username == username:
@@ -149,7 +143,7 @@ class CardViewSet(viewsets.ModelViewSet):
 			context = { 'request': request }
 		)
 		return self.pager.get_paginated_response(serializer.data)
-	@action(detail = True, methods = ['GET', 'POST'])
+	@action(detail = True, methods = ['GET', 'POST'], permission_classes = [permissions.IsAuthenticated])
 	def comment(self, request, pk):
 		post = get_object_or_404(Card, pk = pk)
 		if(request.method == 'GET'):

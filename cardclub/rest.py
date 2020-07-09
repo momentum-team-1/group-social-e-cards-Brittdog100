@@ -28,12 +28,16 @@ class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	pager = PageNumberPagination()
+	permission_classes = [permissions.IsAuthenticated]
 	lookup_field = 'username'
 	def get_queryset(self):
-		request = self.request
-		if not request.user.is_authenticated:
-			return User.objects.none()
 		return User.objects.all()
+	def destroy(self, request, username):
+		user = get_object_or_404(User, username = username)
+		if user != request.user and not request.user.is_staff:
+			return HttpResponse(status = 403)
+		self.perform_destroy(user)
+		return HttpResponse(status = 403)
 	@action(detail = True, methods = ['GET'])
 	def friend_list(self, request, username):
 		user = get_object_or_404(User, username = username)

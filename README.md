@@ -29,10 +29,9 @@ It's an API.
 
 ### User Endpoints
 
-`api/user/` - Does user-related things that are user-ful. I'm extremely funny.
+`api/user/` - returns a list of all users
 
-- `GET`: returns a list of all users
-- `POST`: creates a new user
+`api/user/new/` - creates a new user. Requires an `email`, `username`, and `password`.
 
 `api/user/<str:username>/` - Returns information on a specific user.
 

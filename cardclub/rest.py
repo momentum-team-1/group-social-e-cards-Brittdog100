@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import routers, serializers, viewsets
+from rest_framework import permissions, routers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -40,6 +40,17 @@ class UserViewSet(viewsets.ModelViewSet):
 				return User.objects.all()
 			else:
 				return User.objects.get(user = request.user)
+	@action(detail = False, methods = ['POST'], permission_classes = [permissions.AllowAny])
+	def new(self, request):
+		email = request.data['email']
+		username = request.data['username']
+		password = request.data['password']
+		if email is None or username is None or password is None:
+			return HttpResponse(status = 401)
+		if len(User.objects.filter(username = username).all()) != 0:
+			return HttpResponse(status = 409)
+		user = User.objects.create_user(email = email, username = username, password = password)
+		return HttpResponse(status = 200)
 	@action(detail = True, methods = ['GET'])
 	def friend_list(self, request, username):
 		user = get_object_or_404(User, username = username)
